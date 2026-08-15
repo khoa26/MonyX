@@ -4,16 +4,24 @@ from contextlib import asynccontextmanager
 from app.core.config import settings
 from app.db.neo4j_client import db_client
 from app.db.init_db import init_neo4j_constraints_and_seed
-from app.api.v1.endpoints import auth, data_admin
-from app.api.v1.endpoints import credit
+from app.api.v1.endpoints import auth, data_admin, credit
+from app.services.extractor import DocumentExtractionService
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    # 1. Kết nối Neo4j
     db_client.connect()
     try:
         init_neo4j_constraints_and_seed()
     except Exception as e:
         print(f"[Init Warning] {e}")
+
+    # 2. Khởi tạo & Tải sẵn PaddleOCR tiếng Việt
+    try:
+        DocumentExtractionService.initialize_models()
+    except Exception as e:
+        print(f"[OCR Warmup Warning] {e}")
+
     yield
     db_client.close()
 
