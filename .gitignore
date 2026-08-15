@@ -1,0 +1,15 @@
+# Bỏ qua thư mục thư viện node_modules ở tất cả các cấp
+node_modules/
+frontend/node_modules/
+
+# Bỏ qua các file build / output
+dist/
+build/
+.next/
+out/
+
+# Bỏ qua các file môi trường nhạy cảm
+.env
+.env.local
+.env.development.local
+.env.production.local
