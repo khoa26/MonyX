@@ -1,0 +1,209 @@
+{
+  "document": "giay_de_nghi_vay_von_VP_Bank_t_filled.pdf",
+  "model": "openai/gpt-oss-120b",
+  "schema_file": "schema.json",
+  "fields": {
+    "muc_dich_vay": "Vay đầu tư TSCĐ",
+    "ho_ten": "Nguyễn Bách Khoa",
+    "ngay_sinh": "02/06/2005",
+    "gioi_tinh": "Nam",
+    "so_cmnd_cccd": "074205008021",
+    "ngay_cap": "06/07/2022",
+    "quoc_tich": "Việt Nam",
+    "ho_khau_thuong_tru": "93/98/9 tổ 3 khu phố 9 , phường Phú Lợi, thành phố Hồ Chí Minh",
+    "dia_chi_hien_tai": "028205001234",
+    "dien_thoai_nha_rieng": "nguyenbachkhoa@email.com",
+    "di_dong": "0797677999",
+    "tinh_trang_hon_nhan": "Độc thân",
+    "trinh_do_hoc_van": "Đại học",
+    "phuong_tien_di_lai": "Ô tô",
+    "vi_tri_trong_ho_kinh_doanh": "Chủ hộ",
+    "nghe_nghiep": "AI engineer",
+    "chuc_vu": "Giám đốc kỹ thuật",
+    "kinh_nghiem_lam_viec_thang": 2,
+    "kinh_nghiem_vi_tri_hien_tai_thang": 36,
+    "san_pham_vpbank_36_thang": "Có gửi tiết kiệm và vay vốn",
+    "dia_chi_diem_kinh_doanh": "Công ty TNHH ABC Tech",
+    "tinh_trang_so_huu": "Sở hữu",
+    "noi_cap_dkkd": "Sở KH&ĐT TP.HCM",
+    "nganh_nghe_kinh_doanh_chinh": "Phát triển phần mềm",
+    "von_vay_vpbank": 7000000000,
+    "tong_nguon_von": 7000000000,
+    "nguon_von_khac": 0,
+    "thoi_gian_su_dung_von": 24,
+    "muc_dich_vay_cu_the": "Mở rộng kinh doanh",
+    "thoi_han_vay_thang": 24,
+    "lai_suat": "Hàng tháng",
+    "phuong_thuc_giai_ngan": "Chuyển khoản",
+    "phuong_thuc_tra_no_tra_goc": "Gốc đều",
+    "tsbd_chu_so_huu_ho_ten": "Nguyễn Văn A",
+    "tsbd_chu_so_huu_gioi_tinh": "Nam",
+    "tsbd_chu_so_huu_quoc_tich": "Việt Nam",
+    "tsbd_chu_so_huu_cmnd": "074205008022",
+    "tsbd_chu_so_huu_ngay_cap": "06/07/2022",
+    "tsbd_chu_so_huu_noi_cap": "Cục CS QLHC về TTXH",
+    "tsbd_chu_so_huu_dia_chi": "93/98/9 tổ 3 khu phố 9, P. Phú Lợi, TP.HCM",
+    "tsbd_chu_so_huu_di_dong": "0797677998",
+    "tsbd_chu_so_huu_hon_nhan": "Đã kết hôn",
+    "tsbd_chu_so_huu_hoc_van": "Trình độ học vấn cấp trung",
+    "tsbd_chu_so_huu_nghe_nghiep": "Kinh doanh tự do",
+    "tsbd_chu_so_huu_co_quan": "Công ty BĐS ABC",
+    "tsbd_chu_so_huu_dia_chi_co_quan": "123 Đường ABC, Q.1, TP.HCM",
+    "nguoi_lien_he_ho_ten": "Nguyễn Thị B",
+    "nguoi_lien_he_di_dong": "0797677997",
+    "nguoi_lien_he_email": "nguyenthib@email.com",
+    "nguoi_lien_he_quan_he": "Mẹ ruột",
+    "nguoi_lien_he_nghe_nghiep": "Nội trợ",
+    "online_goi_dich_vu": "Gói cao cấp",
+    "bl_quan_he": "Cha mẹ",
+    "bl_ho_ten": "Nguyễn Văn C",
+    "bl_gioi_tinh": "Nam",
+    "bl_quoc_tich": "Việt Nam",
+    "nh_gt_ho_ten": "Trần Văn D",
+    "nh_gt_di_dong": "0797677995",
+    "nh_gt_cif": "0797677995",
+    "nh_pb_email": "trand@email.com",
+    "nh_pb_chi_nhanh": "Chi nhánh TP.HCM",
+    "nh_lai_suat": 7000000000,
+    "nh_thoi_gian_vay": 24,
+    "nh_von_vay": 123456,
+    "nh_muc_dich_vay": "phát triển kinh doanh"
+  },
+  "pages": [
+    {
+      "page": 1,
+      "sections": [
+        "muc_dich_vay",
+        "thong_tin_phap_ly"
+      ],
+      "extracted": {
+        "muc_dich_vay": "Vay đầu tư TSCĐ",
+        "ho_ten": "Nguyễn Bách Khoa",
+        "ngay_sinh": "02/06/2005",
+        "gioi_tinh": "Nam",
+        "so_cmnd_cccd": "074205008021",
+        "ngay_cap": "06/07/2022",
+        "quoc_tich": "Việt Nam",
+        "ho_khau_thuong_tru": "93/98/9 tổ 3 khu phố 9 , phường Phú Lợi, thành phố Hồ Chí Minh",
+        "dia_chi_hien_tai": "028205001234",
+        "dien_thoai_nha_rieng": "nguyenbachkhoa@email.com",
+        "di_dong": "0797677999",
+        "tinh_trang_hon_nhan": "Độc thân",
+        "trinh_do_hoc_van": "Đại học",
+        "phuong_tien_di_lai": "Ô tô",
+        "vi_tri_trong_ho_kinh_doanh": "Chủ hộ",
+        "nghe_nghiep": "AI engineer",
+        "chuc_vu": "Giám đốc kỹ thuật",
+        "kinh_nghiem_lam_viec_thang": 2,
+        "kinh_nghiem_vi_tri_hien_tai_thang": 36,
+        "san_pham_vpbank_36_thang": "Có gửi tiết kiệm và vay vốn"
+      }
+    },
+    {
+      "page": 2,
+      "sections": [
+        "hoat_dong_sxkd",
+        "quan_he_tctd"
+      ],
+      "extracted": {
+        "dia_chi_diem_kinh_doanh": "Công ty TNHH ABC Tech",
+        "tinh_trang_so_huu": "Sở hữu",
+        "noi_cap_dkkd": "Sở KH&ĐT TP.HCM",
+        "nganh_nghe_kinh_doanh_chinh": "Phát triển phần mềm"
+      }
+    },
+    {
+      "page": 3,
+      "sections": [
+        "tai_chinh_tai_san",
+        "phuong_an_von",
+        "de_nghi_cap_tin_dung"
+      ],
+      "extracted": {
+        "von_vay_vpbank": 7000000000,
+        "tong_nguon_von": 7000000000,
+        "nguon_von_khac": 0,
+        "thoi_gian_su_dung_von": 24,
+        "muc_dich_vay_cu_the": "Mở rộng kinh doanh",
+        "thoi_han_vay_thang": 24,
+        "lai_suat": "Hàng tháng",
+        "phuong_thuc_giai_ngan": "Chuyển khoản",
+        "phuong_thuc_tra_no_tra_goc": "Gốc đều"
+      }
+    },
+    {
+      "page": 4,
+      "sections": [
+        "tsbd"
+      ],
+      "extracted": {
+        "tsbd_chu_so_huu_ho_ten": "Nguyễn Văn A",
+        "tsbd_chu_so_huu_gioi_tinh": "Nam",
+        "tsbd_chu_so_huu_quoc_tich": "Việt Nam",
+        "tsbd_chu_so_huu_cmnd": "074205008022",
+        "tsbd_chu_so_huu_ngay_cap": "06/07/2022",
+        "tsbd_chu_so_huu_noi_cap": "Cục CS QLHC về TTXH",
+        "tsbd_chu_so_huu_dia_chi": "93/98/9 tổ 3 khu phố 9, P. Phú Lợi, TP.HCM",
+        "tsbd_chu_so_huu_di_dong": "0797677998",
+        "tsbd_chu_so_huu_hon_nhan": "Đã kết hôn",
+        "tsbd_chu_so_huu_hoc_van": "Trình độ học vấn cấp trung",
+        "tsbd_chu_so_huu_nghe_nghiep": "Kinh doanh tự do",
+        "tsbd_chu_so_huu_co_quan": "Công ty BĐS ABC",
+        "tsbd_chu_so_huu_dia_chi_co_quan": "123 Đường ABC, Q.1, TP.HCM"
+      }
+    },
+    {
+      "page": 5,
+      "sections": [
+        "nguoi_lien_he",
+        "the_tin_dung"
+      ],
+      "extracted": {
+        "nguoi_lien_he_ho_ten": "Nguyễn Thị B",
+        "nguoi_lien_he_di_dong": "0797677997",
+        "nguoi_lien_he_email": "nguyenthib@email.com",
+        "nguoi_lien_he_quan_he": "Mẹ ruột",
+        "nguoi_lien_he_nghe_nghiep": "Nội trợ"
+      }
+    },
+    {
+      "page": 6,
+      "sections": [
+        "vpbank_online",
+        "fatca"
+      ],
+      "extracted": {
+        "online_goi_dich_vu": "Gói cao cấp"
+      }
+    },
+    {
+      "page": 9,
+      "sections": [
+        "nguoi_bao_lanh"
+      ],
+      "extracted": {
+        "bl_quan_he": "Cha mẹ",
+        "bl_ho_ten": "Nguyễn Văn C",
+        "bl_gioi_tinh": "Nam",
+        "bl_quoc_tich": "Việt Nam"
+      }
+    },
+    {
+      "page": 10,
+      "sections": [
+        "phan_ngan_hang"
+      ],
+      "extracted": {
+        "nh_gt_ho_ten": "Trần Văn D",
+        "nh_gt_di_dong": "0797677995",
+        "nh_gt_cif": "0797677995",
+        "nh_pb_email": "trand@email.com",
+        "nh_pb_chi_nhanh": "Chi nhánh TP.HCM",
+        "nh_lai_suat": 7000000000,
+        "nh_thoi_gian_vay": 24,
+        "nh_von_vay": 123456,
+        "nh_muc_dich_vay": "phát triển kinh doanh"
+      }
+    }
+  ]
+}

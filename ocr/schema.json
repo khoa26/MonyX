@@ -1,0 +1,244 @@
+{
+  "document": "giay_de_nghi_vay_von_VP_Bank_t.docx",
+  "sections": [
+    {
+      "id": "muc_dich_vay",
+      "title": "1. MỤC ĐÍCH VAY VỐN",
+      "fields": [
+        {"key": "muc_dich_vay", "label": "Mục đích vay vốn", "type": "checkbox", "options": ["Vay đầu tư TSCĐ", "Vay bổ sung vốn/ mở rộng/ phát triển kinh doanh", "Vay BSVLĐ theo hạn mức"]}
+      ]
+    },
+    {
+      "id": "thong_tin_phap_ly",
+      "title": "2. THÔNG TIN PHÁP LÝ CỦA KHÁCH HÀNG/ BÊN VAY/ CHỦ THẺ CHÍNH",
+      "fields": [
+        {"key": "ho_ten", "label": "Họ và tên", "type": "text"},
+        {"key": "ngay_sinh", "label": "Ngày/ tháng/ năm sinh", "type": "date"},
+        {"key": "gioi_tinh", "label": "Giới tính", "type": "checkbox", "options": ["Nam", "Nữ"]},
+        {"key": "so_cmnd_cccd", "label": "Số CMND/Hộ chiếu/Thẻ CCCD", "type": "text"},
+        {"key": "ngay_cap", "label": "Ngày cấp", "type": "date"},
+        {"key": "noi_cap", "label": "Nơi cấp", "type": "text"},
+        {"key": "quoc_tich", "label": "Quốc tịch", "type": "text"},
+        {"key": "ho_khau_thuong_tru", "label": "Hộ khẩu thường trú", "type": "text"},
+        {"key": "dia_chi_hien_tai", "label": "Địa chỉ hiện tại", "type": "text"},
+        {"key": "dien_thoai_nha_rieng", "label": "Điện thoại nhà riêng", "type": "text"},
+        {"key": "di_dong", "label": "Di động", "type": "text"},
+        {"key": "email", "label": "Email", "type": "text"},
+        {"key": "tinh_trang_hon_nhan", "label": "Tình trạng hôn nhân", "type": "checkbox", "options": ["Độc thân", "Đã kết hôn", "Ly hôn", "Góa bụa", "Khác"]},
+        {"key": "trinh_do_hoc_van", "label": "Trình độ học vấn", "type": "text"},
+        {"key": "hinh_thuc_so_huu_nha", "label": "Hình thức sở hữu/ sử dụng nhà ở", "type": "text"},
+        {"key": "so_nguoi_phu_thuoc", "label": "Số người phụ thuộc", "type": "number"},
+        {"key": "tuoi_phu_thuoc_thap_nhat", "label": "Tuổi của người phụ thuộc có tuổi thấp nhất", "type": "number"},
+        {"key": "phuong_tien_di_lai", "label": "Phương tiện đi lại", "type": "checkbox", "options": ["Ô tô", "Xe máy", "Khác"]},
+        {"key": "vi_tri_trong_ho_kinh_doanh", "label": "Vị trí trong hộ kinh doanh", "type": "checkbox", "options": ["Chủ hộ", "Thành viên"]},
+        {"key": "nghe_nghiep", "label": "Nghề nghiệp", "type": "text"},
+        {"key": "chuc_vu", "label": "Chức vụ", "type": "text"},
+        {"key": "kinh_nghiem_lam_viec_thang", "label": "Kinh nghiệm làm việc của người vay (số tháng)", "type": "number"},
+        {"key": "kinh_nghiem_vi_tri_hien_tai_thang", "label": "Kinh nghiệm làm việc ở vị trí hiện tại (số tháng)", "type": "number"},
+        {"key": "san_pham_vpbank_36_thang", "label": "Sản phẩm dịch vụ VPBank sử dụng trong 36 tháng gần đây", "type": "checkbox", "options": ["Có gửi tiết kiệm", "Có vay vốn", "Có gửi tiết kiệm và vay vốn", "Có sử dụng sản phẩm nhưng không gửi tiết kiệm/vay vốn", "Không sử dụng dịch vụ nào"]}
+      ]
+    },
+    {
+      "id": "hoat_dong_sxkd",
+      "title": "3. MÔ TẢ VỀ HOẠT ĐỘNG SẢN XUẤT, KINH DOANH",
+      "fields": [
+        {"key": "ten_co_so_sxkd", "label": "Tên cơ sở sản xuất kinh doanh", "type": "text"},
+        {"key": "so_dang_ky_kinh_doanh", "label": "Số đăng ký kinh doanh", "type": "text"},
+        {"key": "noi_cap_dkkd", "label": "Nơi cấp đăng ký kinh doanh", "type": "text"},
+        {"key": "ngay_cap_dkkd", "label": "Ngày cấp đăng ký kinh doanh", "type": "date"},
+        {"key": "nganh_nghe_kinh_doanh_chinh", "label": "Ngành nghề kinh doanh chính", "type": "text"},
+        {"key": "ten_nguoi_dai_dien_hkd", "label": "Tên người đại diện HKD", "type": "text"},
+        {"key": "dia_chi_diem_kinh_doanh", "label": "Địa chỉ địa điểm kinh doanh chính", "type": "text"},
+        {"key": "dien_tich_mat_bang_m2", "label": "Diện tích mặt bằng (m2)", "type": "number"},
+        {"key": "so_luong_nhan_vien", "label": "Số lượng nhân viên", "type": "number"},
+        {"key": "tinh_trang_so_huu", "label": "Tình trạng sở hữu", "type": "checkbox", "options": ["Sở hữu", "Thuê/mượn", "Quầy sạp", "Địa điểm kinh doanh độc lập"]},
+        {"key": "thoi_gian_thue_con_lai", "label": "Thời gian thuê còn lại (tháng)", "type": "number"},
+        {"key": "gia_thue_thang", "label": "Giá thuê (tháng)", "type": "number"}
+      ]
+    },
+    {
+      "id": "quan_he_tctd",
+      "title": "4. TÌNH HÌNH QUAN HỆ VỚI CÁC TCTD",
+      "fields": [
+        {"key": "san_pham_vpbank_dang_dung", "label": "Sản phẩm/dịch vụ VPBank đang sử dụng", "type": "checkbox", "options": ["Gửi tiết kiệm", "Giao dịch tài khoản", "Tín dụng", "Các dịch vụ khác", "Chưa từng giao dịch"]},
+        {"key": "tin_dung_khach_hang", "label": "Tình hình quan hệ tín dụng của Khách hàng", "type": "table", "columns": ["ten_tctd", "loai_khoan_vay", "du_no_vay", "ngay_vay", "ngay_den_han", "tra_goc_lai_hang_thang", "ten_tsbd_tri_gia_chu_so_huu"]},
+        {"key": "tin_dung_nguoi_bao_lanh", "label": "Tình hình quan hệ tín dụng của Người bảo lãnh trả nợ", "type": "table", "columns": ["ten_tctd", "loai_khoan_vay", "du_no_vay", "ngay_vay", "ngay_den_han", "tra_goc_lai_hang_thang", "ten_tsbd_tri_gia_chu_so_huu"]},
+        {"key": "the_tin_dung_hien_tai", "label": "Thẻ tín dụng hiện có", "type": "table", "columns": ["loai_the", "ten_tctd", "ngay_mo_the", "ngay_het_han", "han_muc_tin_dung"]}
+      ]
+    },
+    {
+      "id": "tai_chinh_tai_san",
+      "title": "5. THÔNG TIN TÀI CHÍNH VÀ TÀI SẢN SỞ HỮU",
+      "fields": [
+        {"key": "thu_nhap_loi_nhuan_kinh_doanh", "label": "Lợi nhuận từ kinh doanh", "type": "number"},
+        {"key": "thu_nhap_luong", "label": "Thu nhập từ lương", "type": "number"},
+        {"key": "thu_nhap_cho_thue", "label": "Thu nhập từ cho thuê tài sản", "type": "number"},
+        {"key": "thu_nhap_khac", "label": "Thu nhập khác", "type": "number"},
+        {"key": "tong_thu_nhap_A", "label": "Tổng thu nhập (A)", "type": "number"},
+        {"key": "chi_phi_sinh_hoat", "label": "Chi phí sinh hoạt", "type": "number"},
+        {"key": "chi_phi_tra_goc_lai", "label": "Chi phí trả gốc lãi các khoản vay", "type": "number"},
+        {"key": "chi_phi_khac", "label": "Các chi phí khác", "type": "number"},
+        {"key": "tong_chi_phi_B", "label": "Tổng chi phí (B)", "type": "number"},
+        {"key": "chenh_lech_A_B", "label": "Chênh lệch thu nhập chi phí (=A-B)", "type": "number"},
+        {"key": "tai_san_dong_san", "label": "Động sản (tên, giá trị)", "type": "text"},
+        {"key": "tai_san_bat_dong_san", "label": "Bất động sản (tên, giá trị)", "type": "text"},
+        {"key": "tai_san_khac", "label": "Các tài sản khác (tên, giá trị)", "type": "text"}
+      ]
+    },
+    {
+      "id": "phuong_an_von",
+      "title": "6. PHƯƠNG ÁN SỬ DỤNG VỐN",
+      "fields": [
+        {"key": "tong_nguon_von", "label": "Tổng nguồn vốn cần sử dụng", "type": "number"},
+        {"key": "von_vay_vpbank", "label": "Vốn vay tại VPBank", "type": "number"},
+        {"key": "nguon_von_khac", "label": "Các nguồn vốn khác", "type": "number"},
+        {"key": "thoi_gian_su_dung_von", "label": "Thời gian sử dụng vốn", "type": "text"},
+        {"key": "muc_dich_su_dung_von", "label": "Mục đích sử dụng vốn", "type": "text"},
+        {"key": "nguon_tra_no", "label": "Nguồn trả nợ", "type": "text"},
+        {"key": "phuong_an_du_an", "label": "Phương án, dự án thực hiện hoạt động kinh doanh", "type": "text"}
+      ]
+    },
+    {
+      "id": "de_nghi_cap_tin_dung",
+      "title": "7. ĐỀ NGHỊ VPBANK CẤP TÍN DỤNG",
+      "fields": [
+        {"key": "muc_dich_vay_cu_the", "label": "Mục đích vay vốn (ghi cụ thể)", "type": "text"},
+        {"key": "thoi_han_vay_thang", "label": "Thời hạn vay (tháng)", "type": "number"},
+        {"key": "lai_suat", "label": "Lãi suất", "type": "text"},
+        {"key": "phuong_thuc_giai_ngan", "label": "Phương thức giải ngân", "type": "checkbox", "options": ["Chuyển khoản", "Tiền mặt"]},
+        {"key": "phuong_thuc_tra_no_tra_lai", "label": "Phương thức trả nợ - Trả lãi", "type": "text"},
+        {"key": "phuong_thuc_tra_no_tra_goc", "label": "Phương thức trả nợ - Trả gốc", "type": "text"},
+        {"key": "de_xuat_khac", "label": "Đề xuất khác", "type": "text"}
+      ]
+    },
+    {
+      "id": "tsbd",
+      "title": "8. THÔNG TIN TÀI SẢN ĐẢM BẢO",
+      "fields": [
+        {"key": "tsbd_ten_tai_san", "label": "Tên tài sản bảo đảm", "type": "text"},
+        {"key": "tsbd_ten_chu_so_huu", "label": "Tên chủ sở hữu TSBĐ", "type": "text"},
+        {"key": "tsbd_moi_quan_he", "label": "Mối quan hệ của chủ sở hữu TSBĐ và khách hàng vay", "type": "text"},
+        {"key": "tsbd_gia_tri_uoc_tinh", "label": "Giá trị ước tính của TSBĐ (Đồng)", "type": "number"},
+        {"key": "tsbd_quyen_so_huu", "label": "Quyền sở hữu và đảm bảo nghĩa vụ", "type": "checkbox", "options": ["Đang bảo đảm", "Không"]},
+        {"key": "tsbd_quan_he_chu_so_huu", "label": "Quan hệ với KH/Bên vay/Chủ thẻ chính", "type": "checkbox", "options": ["Cha mẹ - con cái", "Anh chị em", "Họ hàng", "Bạn bè", "Khác"]},
+        {"key": "tsbd_chu_so_huu_ho_ten", "label": "Chủ sở hữu TSBĐ - Họ và tên", "type": "text"},
+        {"key": "tsbd_chu_so_huu_ngay_sinh", "label": "Chủ sở hữu TSBĐ - Ngày sinh", "type": "date"},
+        {"key": "tsbd_chu_so_huu_gioi_tinh", "label": "Chủ sở hữu TSBĐ - Giới tính", "type": "checkbox", "options": ["Nam", "Nữ"]},
+        {"key": "tsbd_chu_so_huu_quoc_tich", "label": "Chủ sở hữu TSBĐ - Quốc tịch", "type": "text"},
+        {"key": "tsbd_chu_so_huu_cmnd", "label": "Chủ sở hữu TSBĐ - Số CMND/Hộ chiếu/CCCD", "type": "text"},
+        {"key": "tsbd_chu_so_huu_ngay_cap", "label": "Chủ sở hữu TSBĐ - Ngày cấp", "type": "date"},
+        {"key": "tsbd_chu_so_huu_noi_cap", "label": "Chủ sở hữu TSBĐ - Nơi cấp", "type": "text"},
+        {"key": "tsbd_chu_so_huu_hktt", "label": "Chủ sở hữu TSBĐ - Hộ khẩu thường trú", "type": "text"},
+        {"key": "tsbd_chu_so_huu_dia_chi", "label": "Chủ sở hữu TSBĐ - Địa chỉ hiện tại", "type": "text"},
+        {"key": "tsbd_chu_so_huu_di_dong", "label": "Chủ sở hữu TSBĐ - Di động", "type": "text"},
+        {"key": "tsbd_chu_so_huu_hon_nhan", "label": "Chủ sở hữu TSBĐ - Tình trạng hôn nhân", "type": "text"},
+        {"key": "tsbd_chu_so_huu_hoc_van", "label": "Chủ sở hữu TSBĐ - Trình độ học vấn", "type": "text"},
+        {"key": "tsbd_chu_so_huu_nghe_nghiep", "label": "Chủ sở hữu TSBĐ - Nghề nghiệp, chức vụ", "type": "text"},
+        {"key": "tsbd_chu_so_huu_co_quan", "label": "Chủ sở hữu TSBĐ - Tên cơ quan", "type": "text"},
+        {"key": "tsbd_chu_so_huu_dia_chi_co_quan", "label": "Chủ sở hữu TSBĐ - Địa chỉ cơ quan", "type": "text"}
+      ]
+    },
+    {
+      "id": "nguoi_lien_he",
+      "title": "9. THÔNG TIN NGƯỜI LIÊN HỆ",
+      "fields": [
+        {"key": "nguoi_lien_he_ho_ten", "label": "Người liên hệ - Họ và tên", "type": "text"},
+        {"key": "nguoi_lien_he_di_dong", "label": "Người liên hệ - Điện thoại di động", "type": "text"},
+        {"key": "nguoi_lien_he_email", "label": "Người liên hệ - Email", "type": "text"},
+        {"key": "nguoi_lien_he_quan_he", "label": "Người liên hệ - Quan hệ với người vay", "type": "text"},
+        {"key": "nguoi_lien_he_nghe_nghiep", "label": "Người liên hệ - Nghề nghiệp", "type": "text"}
+      ]
+    },
+    {
+      "id": "the_tin_dung",
+      "title": "10. THÔNG TIN ĐĂNG KÝ PHÁT HÀNH THẺ TÍN DỤNG",
+      "fields": [
+        {"key": "the_loai_the", "label": "Loại thẻ tín dụng quốc tế đăng ký", "type": "checkbox", "options": ["VPBank MasterCard MC2/Màu cam", "VPBank MasterCard MC2/Màu tím", "StepUp Titanium MasterCard", "VPLady Titanium MasterCard", "VPBank MasterCard Platinum", "VNA – VPBank MasterCard Platinum", "Thẻ khác"]},
+        {"key": "the_han_muc", "label": "Hạn mức tín dụng đề nghị (VND)", "type": "number"},
+        {"key": "the_so_hoi_vien", "label": "Số thẻ hội viên Bông sen vàng", "type": "text"},
+        {"key": "the_ten_in_tren_the", "label": "Tên in trên thẻ", "type": "text"},
+        {"key": "the_so_tai_khoan", "label": "Số tài khoản thanh toán tự động", "type": "text"},
+        {"key": "the_ty_le_thanh_toan", "label": "Tỷ lệ thanh toán", "type": "checkbox", "options": ["Thanh toán tối thiểu", "Thanh toán toàn bộ"]}
+      ]
+    },
+    {
+      "id": "the_phu",
+      "title": "11. THÔNG TIN ĐĂNG KÝ PHÁT HÀNH THẺ PHỤ",
+      "fields": [
+        {"key": "the_phu_ho_ten", "label": "Thẻ phụ - Họ và tên", "type": "text"},
+        {"key": "the_phu_ngay_sinh", "label": "Thẻ phụ - Ngày sinh", "type": "date"},
+        {"key": "the_phu_noi_sinh", "label": "Thẻ phụ - Nơi sinh", "type": "text"},
+        {"key": "the_phu_gioi_tinh", "label": "Thẻ phụ - Giới tính", "type": "checkbox", "options": ["Nam", "Nữ"]},
+        {"key": "the_phu_ten_in_the", "label": "Thẻ phụ - Tên in trên thẻ", "type": "text"},
+        {"key": "the_phu_cmnd", "label": "Thẻ phụ - Số CMND/Hộ chiếu/CCCD", "type": "text"},
+        {"key": "the_phu_ngay_cap", "label": "Thẻ phụ - Ngày cấp", "type": "date"},
+        {"key": "the_phu_noi_cap", "label": "Thẻ phụ - Nơi cấp", "type": "text"},
+        {"key": "the_phu_quoc_tich", "label": "Thẻ phụ - Quốc tịch", "type": "text"},
+        {"key": "the_phu_dia_chi", "label": "Thẻ phụ - Địa chỉ nơi ở hiện tại", "type": "text"},
+        {"key": "the_phu_nghe_nghiep", "label": "Thẻ phụ - Nghề nghiệp", "type": "text"},
+        {"key": "the_phu_chuc_vu", "label": "Thẻ phụ - Chức vụ", "type": "text"},
+        {"key": "the_phu_quan_he", "label": "Thẻ phụ - Quan hệ với chủ thẻ chính", "type": "text"},
+        {"key": "the_phu_han_muc", "label": "Thẻ phụ - Hạn mức tín dụng đề nghị (VNĐ)", "type": "number"}
+      ]
+    },
+    {
+      "id": "vpbank_online",
+      "title": "12. DỊCH VỤ NGÂN HÀNG ĐIỆN TỬ VPBank ONLINE",
+      "fields": [
+        {"key": "online_ten_truy_cap", "label": "Tên truy cập VPBank Online", "type": "text"},
+        {"key": "online_goi_dich_vu", "label": "Gói dịch vụ", "type": "checkbox", "options": ["Gói truy vấn", "Gói tiêu chuẩn", "Gói cao cấp"]},
+        {"key": "online_sms_sdt", "label": "VPBank SMS - Số điện thoại đăng ký", "type": "text"},
+        {"key": "online_bankplus_sdt", "label": "VPBank Bankplus - Số điện thoại đăng ký", "type": "text"}
+      ]
+    },
+    {
+      "id": "fatca",
+      "title": "13. THÔNG TIN FATCA",
+      "fields": [
+        {"key": "fatca_thuoc_dien", "label": "Thuộc diện FATCA", "type": "checkbox", "options": ["Có", "Không"]},
+        {"key": "fatca_ma_so_thue", "label": "Mã số thuế Hoa Kỳ (U.S.TIN)", "type": "text"}
+      ]
+    },
+    {
+      "id": "nguoi_bao_lanh",
+      "title": "PHỤ LỤC 1 - THÔNG TIN NGƯỜI BẢO LÃNH/ NGƯỜI ĐỒNG TRẢ NỢ",
+      "fields": [
+        {"key": "bl_quan_he", "label": "Người bảo lãnh - Quan hệ với chủ hộ", "type": "text"},
+        {"key": "bl_ho_ten", "label": "Người bảo lãnh - Họ và tên", "type": "text"},
+        {"key": "bl_ngay_sinh", "label": "Người bảo lãnh - Ngày sinh", "type": "date"},
+        {"key": "bl_gioi_tinh", "label": "Người bảo lãnh - Giới tính", "type": "checkbox", "options": ["Nam", "Nữ"]},
+        {"key": "bl_quoc_tich", "label": "Người bảo lãnh - Quốc tịch", "type": "text"},
+        {"key": "bl_cmnd", "label": "Người bảo lãnh - Số CMND/Hộ chiếu/CCCD", "type": "text"},
+        {"key": "bl_ngay_cap", "label": "Người bảo lãnh - Ngày cấp", "type": "date"},
+        {"key": "bl_noi_cap", "label": "Người bảo lãnh - Nơi cấp", "type": "text"},
+        {"key": "bl_hktt", "label": "Người bảo lãnh - Hộ khẩu thường trú", "type": "text"},
+        {"key": "bl_dia_chi", "label": "Người bảo lãnh - Địa chỉ hiện tại", "type": "text"},
+        {"key": "bl_di_dong", "label": "Người bảo lãnh - Di động", "type": "text"},
+        {"key": "bl_hon_nhan", "label": "Người bảo lãnh - Tình trạng hôn nhân", "type": "text"},
+        {"key": "bl_hoc_van", "label": "Người bảo lãnh - Trình độ học vấn", "type": "text"},
+        {"key": "bl_nghe_nghiep", "label": "Người bảo lãnh - Nghề nghiệp, chức vụ", "type": "text"},
+        {"key": "bl_co_quan", "label": "Người bảo lãnh - Tên cơ quan", "type": "text"},
+        {"key": "bl_dia_chi_co_quan", "label": "Người bảo lãnh - Địa chỉ cơ quan", "type": "text"}
+      ]
+    },
+    {
+      "id": "phan_ngan_hang",
+      "title": "PHẦN DÀNH CHO NGÂN HÀNG",
+      "fields": [
+        {"key": "nh_pb_ho_ten", "label": "Cán bộ bán hàng (PB/PSE/DSA) - Họ và tên", "type": "text"},
+        {"key": "nh_pb_di_dong", "label": "Cán bộ bán hàng - Điện thoại di động", "type": "text"},
+        {"key": "nh_pb_email", "label": "Cán bộ bán hàng - Email", "type": "text"},
+        {"key": "nh_pb_chi_nhanh", "label": "Cán bộ bán hàng - Chi nhánh/PGD", "type": "text"},
+        {"key": "nh_gt_ho_ten", "label": "Người giới thiệu - Họ và tên", "type": "text"},
+        {"key": "nh_gt_di_dong", "label": "Người giới thiệu - Điện thoại di động", "type": "text"},
+        {"key": "nh_gt_cif", "label": "Người giới thiệu - Số CIF", "type": "text"},
+        {"key": "nh_von_vay", "label": "Vốn vay tại VPBank (đề xuất PB)", "type": "number"},
+        {"key": "nh_thoi_gian_vay", "label": "Thời gian vay", "type": "text"},
+        {"key": "nh_muc_dich_vay", "label": "Mục đích vay vốn (đề xuất PB)", "type": "text"},
+        {"key": "nh_phuong_thuc_tra_no", "label": "Phương thức trả nợ", "type": "text"},
+        {"key": "nh_lai_suat", "label": "Lãi suất", "type": "text"},
+        {"key": "nh_tsbd", "label": "Tài sản bảo đảm", "type": "text"}
+      ]
+    }
+  ]
+}
