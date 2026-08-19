@@ -45,7 +45,7 @@ export default function IntakeStep3IndividualForm({
             <input
               type="text"
               required
-              placeholder="NGUYỄN BÁCH KHOA"
+              placeholder="Họ và tên đầy đủ"
               value={borrowerForm.full_name || ""}
               onChange={(e) => setBorrowerForm({ ...borrowerForm, full_name: e.target.value })}
               className="w-full px-3.5 py-2.5 bg-purple-50/30 border border-purple-100 rounded-xl font-bold text-gray-900 focus:bg-white outline-none"
@@ -57,7 +57,7 @@ export default function IntakeStep3IndividualForm({
             <input
               type="text"
               required
-              placeholder="074205008021"
+              placeholder="số CCCD"
               value={borrowerForm.cccd_id || ""}
               onChange={(e) => setBorrowerForm({ ...borrowerForm, cccd_id: e.target.value })}
               className="w-full px-3.5 py-2.5 bg-purple-50/30 border border-purple-100 rounded-xl font-mono font-bold text-[#5B21B6] focus:bg-white outline-none"
@@ -68,7 +68,7 @@ export default function IntakeStep3IndividualForm({
             <label className="block text-gray-500 font-semibold mb-1">Ngày sinh (DD/MM/YYYY)</label>
             <input
               type="text"
-              placeholder="02/06/2005"
+              placeholder="DD/MM/YYYY"
               value={borrowerForm.dob || ""}
               onChange={(e) => setBorrowerForm({ ...borrowerForm, dob: e.target.value })}
               className="w-full px-3.5 py-2.5 bg-purple-50/30 border border-purple-100 rounded-xl focus:bg-white outline-none"
@@ -101,7 +101,7 @@ export default function IntakeStep3IndividualForm({
             <label className="block text-gray-500 font-semibold mb-1">Quê quán</label>
             <input
               type="text"
-              placeholder="Quảng Nam"
+              placeholder="Bình Dương"
               value={borrowerForm.place_of_origin || ""}
               onChange={(e) => setBorrowerForm({ ...borrowerForm, place_of_origin: e.target.value })}
               className="w-full px-3.5 py-2.5 bg-purple-50/30 border border-purple-100 rounded-xl focus:bg-white outline-none"
@@ -123,7 +123,7 @@ export default function IntakeStep3IndividualForm({
             <label className="block text-gray-500 font-semibold mb-1">Giá trị đến ngày</label>
             <input
               type="text"
-              placeholder="02/06/2030"
+              placeholder="DD/MM/YYYY"
               value={borrowerForm.date_of_expiry || ""}
               onChange={(e) => setBorrowerForm({ ...borrowerForm, date_of_expiry: e.target.value })}
               className="w-full px-3.5 py-2.5 bg-purple-50/30 border border-purple-100 rounded-xl focus:bg-white outline-none"
