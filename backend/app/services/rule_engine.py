@@ -5,24 +5,94 @@ from app.db.neo4j_client import db_client
 class GraphRuleEngine:
     """
     Engine phân tích mẫu hình đồ thị (Pattern Matching) phát hiện Cạnh Vàng Điểm g
-    và tính toán trần hạn mức tín dụng theo Điều 136 Luật Các TCTD.
+    và tính toán trần hạn mức tín dụng theo lộ trình Điều 136 Luật Các TCTD.
     """
-    BANK_EQUITY_CAPITAL = 10_000_000_000_000.0  # Vốn tự có DVBank: 10.000 Tỷ VND
-    SINGLE_BORROWER_LIMIT_RATIO = 0.14          # Trần đơn lẻ: 14%
-    RELATED_GROUP_LIMIT_RATIO = 0.23            # Trần nhóm liên quan: 23%
+    DEFAULT_BANK_EQUITY_CAPITAL = 10_000_000_000_000.0  # 10.000 Tỷ VND
+
+    @classmethod
+    def get_statutory_limits(cls, date_str: str = None) -> Dict[str, Any]:
+        """
+        Tra cứu tỷ lệ trần Điều 136 theo lộ trình thời gian thực.
+        """
+        if not date_str:
+            dt = datetime.now()
+        else:
+            try:
+                dt = datetime.strptime(date_str.split("T")[0], "%Y-%m-%d")
+            except Exception:
+                dt = datetime.now()
+
+        if dt < datetime(2026, 1, 1):
+            return {
+                "phase": "Trước ngày 01/01/2026",
+                "single_limit_ratio": 0.14,
+                "group_limit_ratio": 0.23,
+                "year_label": "< 2026"
+            }
+        elif dt < datetime(2027, 1, 1):
+            return {
+                "phase": "Từ 01/01/2026 đến trước 01/01/2027",
+                "single_limit_ratio": 0.13,
+                "group_limit_ratio": 0.21,
+                "year_label": "2026"
+            }
+        elif dt < datetime(2028, 1, 1):
+            return {
+                "phase": "Từ 01/01/2027 đến trước 01/01/2028",
+                "single_limit_ratio": 0.12,
+                "group_limit_ratio": 0.19,
+                "year_label": "2027"
+            }
+        elif dt < datetime(2029, 1, 1):
+            return {
+                "phase": "Từ 01/01/2028 đến trước 01/01/2029",
+                "single_limit_ratio": 0.11,
+                "group_limit_ratio": 0.17,
+                "year_label": "2028"
+            }
+        else:
+            return {
+                "phase": "Từ ngày 01/01/2029 trở đi",
+                "single_limit_ratio": 0.10,
+                "group_limit_ratio": 0.15,
+                "year_label": ">= 2029"
+            }
+
+    @classmethod
+    def get_bank_config(cls) -> Dict[str, Any]:
+        query = """
+        MERGE (b:Bank {name: "DVBank"})
+        ON CREATE SET 
+            b.full_name = "Ngân hàng Thương mại Cổ phần DVBank",
+            b.equity_capital = 10000000000000.0,
+            b.charter_capital = 8000000000000.0,
+            b.single_limit_ratio = 0.13,
+            b.group_limit_ratio = 0.21,
+            b.updated_at = datetime()
+        RETURN 
+            coalesce(b.name, "DVBank") AS name,
+            coalesce(b.full_name, "Ngân hàng TMCP DVBank") AS full_name,
+            coalesce(b.equity_capital, 10000000000000.0) AS equity_capital,
+            coalesce(b.charter_capital, 8000000000000.0) AS charter_capital,
+            toString(coalesce(b.updated_at, datetime())) AS updated_at
+        """
+        res = db_client.execute_query(query)
+        if res:
+            return res[0]
+        return {
+            "name": "DVBank",
+            "full_name": "Ngân hàng TMCP DVBank",
+            "equity_capital": cls.DEFAULT_BANK_EQUITY_CAPITAL,
+            "charter_capital": 8_000_000_000_000.0,
+            "updated_at": datetime.now().isoformat()
+        }
 
     @classmethod
     def detect_risk_based_relationships(cls, identifier: str, customer_type: str) -> List[Dict[str, Any]]:
-        """
-        Quét Master DB để phát hiện các mẫu hình rủi ro Điểm g (Cạnh Vàng - risk_based)
-        theo Bảng quy tắc 7.1.B trong tài liệu quy chuẩn.
-        """
         flagged_edges = []
 
         if customer_type == "ENTERPRISE":
-            # -----------------------------------------------------------------
-            # MẪU HÌNH 11: Hai công ty có Lãnh đạo / Cổ đông lớn là Vợ/Chồng hoặc Anh/Em
-            # -----------------------------------------------------------------
+            # QUY TẮC 11: Sở hữu / Quản lý chéo qua quan hệ gia đình (Điểm g)
             query_rule_11 = """
             MATCH (c1:Company {tax_code: $tax_code})<-[r1:RELATED_TO]-(p1:Person)-[rf:FAMILY]-(p2:Person)-[r2:RELATED_TO]->(c2:Company)
             WHERE c1 <> c2 
@@ -55,9 +125,7 @@ class GraphRuleEngine:
                     "reason_summary": f"{row['c1_name']} ({row['p1_name']} - {row['r1_role']}) có quan hệ gia đình '{row['family_rel']}' với {row['p2_name']} ({row['r2_role']} tại {row['c2_name']})."
                 })
 
-            # -----------------------------------------------------------------
-            # MẪU HÌNH 12: Hai công ty chung 1 Tổng giám đốc / Người quản lý điều hành thuê (0% vốn)
-            # -----------------------------------------------------------------
+            # QUY TẮC 12: Chung Giám đốc điều hành thuê (Điểm g)
             query_rule_12 = """
             MATCH (c1:Company {tax_code: $tax_code})<-[r1:RELATED_TO {relation_point: 'b'}]-(p:Person)-[r2:RELATED_TO {relation_point: 'b'}]->(c2:Company)
             WHERE c1 <> c2 AND coalesce(r1.ownership_pct, 0) = 0 AND coalesce(r2.ownership_pct, 0) = 0
@@ -85,9 +153,7 @@ class GraphRuleEngine:
                     "reason_summary": f"Ông/Bà {row['manager_name']} đồng thời giữ chức vụ quản lý tại {row['c1_name']} ({row['r1_pos']}) và {row['c2_name']} ({row['r2_pos']})."
                 })
 
-            # -----------------------------------------------------------------
-            # MẪU HÌNH 14: Trùng địa chỉ trụ sở kinh doanh
-            # -----------------------------------------------------------------
+            # QUY TẮC 14: Trùng địa chỉ trụ sở
             query_rule_14 = """
             MATCH (c1:Company {tax_code: $tax_code}), (c2:Company)
             WHERE c1 <> c2 
@@ -118,9 +184,7 @@ class GraphRuleEngine:
                     "reason_summary": f"Hai doanh nghiệp đăng ký cùng địa chỉ: {row['shared_address']}."
                 })
 
-            # -----------------------------------------------------------------
-            # MẪU HÌNH 15: Cổ đông sở hữu < 5% nhưng nghi vấn chi phối
-            # -----------------------------------------------------------------
+            # QUY TẮC 15: Cổ đông < 5% nghi vấn đứng tên hộ
             query_rule_15 = """
             MATCH (c:Company {tax_code: $tax_code})<-[r:RELATED_TO]-(p:Person)
             WHERE r.ownership_pct > 0 AND r.ownership_pct < 5
@@ -144,7 +208,7 @@ class GraphRuleEngine:
                     "target_type": "Company",
                     "relation_subtype": f"Cổ đông nắm {row['pct']}% vốn",
                     "review_status": "pending_review",
-                    "reason_summary": f"Cá nhân nắm giữ {row['pct']}% vốn tại {row['c_name']} (< ngưỡng 5%), cần thẩm định quyền chi phối thực tế."
+                    "reason_summary": f"Cá nhân nắm giữ {row['pct']}% vốn tại {row['c_name']} (< ngưỡng định lượng 5%)."
                 })
 
         return flagged_edges
@@ -154,11 +218,21 @@ class GraphRuleEngine:
         cls, 
         identifier: str, 
         customer_type: str, 
-        proposed_loan_amount: float
+        proposed_loan_amount: float,
+        application_date: str = None
     ) -> Dict[str, Any]:
         """
-        Tính toán tổng dư nợ nhóm liên quan và đối soát giới hạn tín dụng Điều 136.
+        Tính toán toàn bộ dư nợ đồ thị và phân tích trần hạn mức Điều 136.
         """
+        # 1. Lấy thông số Vốn tự có và Lộ trình áp dụng
+        bank_cfg = cls.get_bank_config()
+        bank_equity_capital = float(bank_cfg.get("equity_capital", cls.DEFAULT_BANK_EQUITY_CAPITAL))
+        
+        statutory = cls.get_statutory_limits(application_date)
+        single_limit_ratio = statutory["single_limit_ratio"]
+        group_limit_ratio = statutory["group_limit_ratio"]
+
+        # 2. Truy xuất toàn bộ thành viên trong đồ thị (chỉ tính cạnh mandatory hoặc risk_based đã confirmed)
         if customer_type == "INDIVIDUAL":
             query_members = """
             MATCH (p:Person {cccd: $id})-[r1*0..2]-(m)
@@ -185,39 +259,56 @@ class GraphRuleEngine:
             """
 
         members_data = db_client.execute_query(query_members, {"id": identifier})
+        
+        # 3. Tính toán dư nợ
         existing_group_debt = sum(row["active_loan_balance"] for row in members_data)
-
         primary_member = next((m for m in members_data if m["member_id"] == identifier), None)
         existing_single_debt = primary_member["active_loan_balance"] if primary_member else 0.0
 
+        # Tổng dư nợ sau khoản vay mới
         total_single_exposure = existing_single_debt + proposed_loan_amount
         total_group_exposure = existing_group_debt + proposed_loan_amount
 
-        single_limit_amount = cls.BANK_EQUITY_CAPITAL * cls.SINGLE_BORROWER_LIMIT_RATIO
-        group_limit_amount = cls.BANK_EQUITY_CAPITAL * cls.RELATED_GROUP_LIMIT_RATIO
+        # Hạn mức tối đa
+        single_limit_amount = bank_equity_capital * single_limit_ratio
+        group_limit_amount = bank_equity_capital * group_limit_ratio
 
-        single_ratio_actual = (total_single_exposure / cls.BANK_EQUITY_CAPITAL) * 100
-        group_ratio_actual = (total_group_exposure / cls.BANK_EQUITY_CAPITAL) * 100
+        actual_single_ratio_pct = (total_single_exposure / bank_equity_capital) * 100
+        actual_group_ratio_pct = (total_group_exposure / bank_equity_capital) * 100
 
         is_single_exceeded = total_single_exposure > single_limit_amount
         is_group_exceeded = total_group_exposure > group_limit_amount
+        is_exceeded = is_single_exceeded or is_group_exceeded
+
+        # 4. Room tín dụng còn lại sau khi tính khoản vay đề xuất
+        remaining_single_room = single_limit_amount - total_single_exposure
+        remaining_group_room = group_limit_amount - total_group_exposure
+        overall_remaining_room = min(remaining_single_room, remaining_group_room)
+
+        # 5. Hạn mức tối đa hồ sơ hiện tại có thể vay (nếu đồ thị trước vay chưa vượt trần)
+        single_capacity_before = max(0.0, single_limit_amount - existing_single_debt)
+        group_capacity_before = max(0.0, group_limit_amount - existing_group_debt)
+        max_allowable_loan_for_applicant = min(single_capacity_before, group_capacity_before)
 
         compliance_status = "COMPLIANT"
-        if is_single_exceeded or is_group_exceeded:
+        if is_exceeded:
             compliance_status = "EXCEEDED_LIMIT"
-        elif group_ratio_actual >= 18.0:
+        elif actual_group_ratio_pct >= (group_limit_ratio * 100 * 0.85):
             compliance_status = "NEAR_LIMIT_WARNING"
 
         return {
-            "bank_equity_capital": cls.BANK_EQUITY_CAPITAL,
+            "bank_name": bank_cfg.get("full_name", "DVBank"),
+            "bank_equity_capital": bank_equity_capital,
+            "statutory_schedule": statutory,
             "proposed_loan_amount": proposed_loan_amount,
             "single_borrower": {
                 "existing_debt": existing_single_debt,
                 "total_exposure": total_single_exposure,
                 "limit_amount": single_limit_amount,
-                "limit_ratio_allowed_pct": cls.SINGLE_BORROWER_LIMIT_RATIO * 100,
-                "actual_ratio_pct": round(single_ratio_actual, 2),
-                "is_exceeded": is_single_exceeded
+                "limit_ratio_allowed_pct": round(single_limit_ratio * 100, 2),
+                "actual_ratio_pct": round(actual_single_ratio_pct, 2),
+                "is_exceeded": is_single_exceeded,
+                "remaining_room": remaining_single_room
             },
             "connected_group": {
                 "member_count": len(members_data),
@@ -225,9 +316,16 @@ class GraphRuleEngine:
                 "existing_group_debt": existing_group_debt,
                 "total_group_exposure": total_group_exposure,
                 "limit_amount": group_limit_amount,
-                "limit_ratio_allowed_pct": cls.RELATED_GROUP_LIMIT_RATIO * 100,
-                "actual_ratio_pct": round(group_ratio_actual, 2),
-                "is_exceeded": is_group_exceeded
+                "limit_ratio_allowed_pct": round(group_limit_ratio * 100, 2),
+                "actual_ratio_pct": round(actual_group_ratio_pct, 2),
+                "is_exceeded": is_group_exceeded,
+                "remaining_room": remaining_group_room
+            },
+            "room_analysis": {
+                "is_exceeded": is_exceeded,
+                "remaining_room_after_loan": overall_remaining_room,
+                "max_allowable_loan": max_allowable_loan_for_applicant,
+                "exceeded_amount": abs(overall_remaining_room) if is_exceeded else 0.0
             },
             "compliance_status": compliance_status
         }

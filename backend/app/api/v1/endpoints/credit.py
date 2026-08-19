@@ -13,6 +13,20 @@ from app.db.neo4j_client import db_client
 
 router = APIRouter()
 
+def clean_identifier(val: Any) -> str:
+    if not val:
+        return ""
+    s = str(val).strip()
+    if s.endswith('.0'):
+        s = s[:-2]
+    cleaned = re.sub(r'[^\w-]', '', s).strip()
+    if not cleaned or cleaned.lower() == 'nan':
+        return ""
+    if cleaned.isdigit() and len(cleaned) == 11:
+        cleaned = cleaned.zfill(12)
+    elif cleaned.isdigit() and len(cleaned) == 9:
+        cleaned = cleaned.zfill(10)
+    return cleaned
 
 # =============================================================================
 # SCHEMAS DTO
@@ -89,7 +103,7 @@ class ReviewRelationshipRequest(BaseModel):
     relationship_id: str
     entity_id_1: str
     entity_id_2: str
-    review_status: str  # confirmed_related hoặc dismissed
+    review_status: str
     review_note: Optional[str] = ""
 
 class ApplicationDecisionRequest(BaseModel):
@@ -127,9 +141,9 @@ def generate_unique_loan_id(
             }
         index += 1
 
-# =============================================================================
+# =============================================================
 # 2. BÓC TÁCH HỒ SƠ PDF
-# =============================================================================
+# =============================================================
 @router.post("/process-individual")
 def process_individual_application(
     loan_application: UploadFile = File(...),
@@ -154,7 +168,7 @@ def process_individual_application(
             "officer_in_charge": officer_username,
             "borrower_profile": {
                 "full_name": cccd_info.get("full_name", "NOT_FOUND"),
-                "cccd_id": cccd_info.get("cccd_id", "NOT_FOUND"),
+                "cccd_id": clean_identifier(cccd_info.get("cccd_id", "NOT_FOUND")),
                 "dob": cccd_info.get("dob", "NOT_FOUND"),
                 "gender": cccd_info.get("gender", "Nam"),
                 "nationality": cccd_info.get("nationality", "Việt Nam"),
@@ -209,7 +223,7 @@ def process_enterprise_application(
             },
             "representative": {
                 "full_name": rep_info.get("full_name", "NOT_FOUND"),
-                "cccd_id": rep_info.get("cccd_id", "NOT_FOUND"),
+                "cccd_id": clean_identifier(rep_info.get("cccd_id", "NOT_FOUND")),
                 "dob": rep_info.get("dob", "NOT_FOUND"),
                 "gender": rep_info.get("gender", "Nam"),
                 "nationality": rep_info.get("nationality", "Việt Nam"),
@@ -230,7 +244,7 @@ def process_enterprise_application(
         shutil.rmtree(upload_dir, ignore_errors=True)
 
 # =============================================================
-# 3. LƯU HỒ SƠ: UPSERT THỰC THỂ (TRỰC TIẾP & BẮC CẦU) MASTER DB
+# 3. LƯU HỒ SƠ: UPSERT MASTER DB (CHUẨN HÓA ĐỊNH DANH 100%)
 # =============================================================
 @router.post("/save-draft-application")
 def save_draft_application(
@@ -242,13 +256,12 @@ def save_draft_application(
     raw_amount = re.sub(r"[^\d]", "", str(loan.loan_amount or "0"))
     amount_numeric = float(raw_amount) if raw_amount else 0.0
 
-    # -------------------------------------------------------------------------
-    # A. KHÁCH HÀNG CÁ NHÂN
-    # -------------------------------------------------------------------------
     if payload.customer_type == "INDIVIDUAL":
         borrower = payload.individual_profile
         if not borrower:
             raise HTTPException(status_code=400, detail="Thiếu thông tin người vay cá nhân.")
+
+        clean_borrower_cccd = clean_identifier(borrower.cccd_id)
 
         cypher_indiv = """
         MERGE (p:Person {cccd: $borrower_cccd})
@@ -298,7 +311,7 @@ def save_draft_application(
         db_client.execute_query(
             cypher_indiv,
             {
-                "borrower_cccd": borrower.cccd_id,
+                "borrower_cccd": clean_borrower_cccd,
                 "borrower_name": borrower.full_name,
                 "dob": borrower.dob,
                 "gender": borrower.gender,
@@ -319,33 +332,30 @@ def save_draft_application(
         )
 
         for rel in payload.related_group:
-            target_id = rel.identifier if rel.identifier and rel.identifier != "NOT_FOUND" else f"TEMP-{uuid.uuid4().hex[:6]}"
+            target_id = clean_identifier(rel.identifier)
+            if not target_id:
+                target_id = f"TEMP-{uuid.uuid4().hex[:6]}"
             raw_ratio = re.sub(r"[^\d.]", "", str(rel.ownership_ratio or "0"))
             ratio_val = float(raw_ratio) if raw_ratio else 0.0
 
-            # Bắc cầu: Person -> Bridge Person -> Target Company (Điểm đ)
             if rel.bridge_kind == "INDIV_RELATIVE_TO_CORP" and rel.bridge_entity and rel.bridge_entity.identifier:
-                bridge_id = rel.bridge_entity.identifier
+                bridge_id = clean_identifier(rel.bridge_entity.identifier)
                 bridge_name = rel.bridge_entity.name or "Người thân trung gian"
                 bridge_rel = rel.bridge_entity.role_or_relationship or "Vợ/chồng"
 
                 bridge_cypher = """
                 MATCH (p:Person {cccd: $borrower_cccd})
-                // 1. Upsert Người thân trung gian (Person)
                 MERGE (bp:Person {cccd: $bridge_cccd})
                 ON CREATE SET bp.full_name = $bridge_name, bp.cif = 'CIF-' + substring($bridge_cccd, 0, 6), bp.created_at = datetime()
                 ON MATCH SET bp.full_name = coalesce($bridge_name, bp.full_name), bp.updated_at = datetime()
 
-                // 2. Upsert Doanh nghiệp đích (Company)
                 MERGE (tc:Company {tax_code: $target_tax_code})
                 ON CREATE SET tc.name = $target_name, tc.created_at = datetime()
                 ON MATCH SET tc.name = coalesce($target_name, tc.name), tc.updated_at = datetime()
 
-                // 3. Nối Person -> Bridge Person (Điểm d)
                 MERGE (p)-[rf:FAMILY]->(bp)
                 SET rf.relationship = $bridge_rel, rf.relation_point = "d", rf.relation_tier = "mandatory", rf.effective_from = toString(date())
 
-                // 4. Nối Bridge Person -> Target Company (Điểm b hoặc Điểm c)
                 MERGE (bp)-[ro:RELATED_TO {relation_point: "c"}]->(tc)
                 SET ro.relation_subtype = "Lãnh đạo / Cổ đông lớn",
                     ro.ownership_ratio = $ratio_str,
@@ -357,7 +367,7 @@ def save_draft_application(
                 db_client.execute_query(
                     bridge_cypher,
                     {
-                        "borrower_cccd": borrower.cccd_id,
+                        "borrower_cccd": clean_borrower_cccd,
                         "bridge_cccd": bridge_id,
                         "bridge_name": bridge_name,
                         "bridge_rel": bridge_rel,
@@ -368,7 +378,6 @@ def save_draft_application(
                     }
                 )
             else:
-                # Quan hệ trực tiếp 0-Hop
                 if rel.entity_type in ["ORGANIZATION", "COMPANY"]:
                     rel_comp_cypher = """
                     MATCH (p:Person {cccd: $borrower_cccd})
@@ -389,7 +398,7 @@ def save_draft_application(
                     db_client.execute_query(
                         rel_comp_cypher,
                         {
-                            "borrower_cccd": borrower.cccd_id,
+                            "borrower_cccd": clean_borrower_cccd,
                             "rel_tax_code": target_id,
                             "rel_name": rel.name,
                             "nationality": rel.nationality or "Việt Nam",
@@ -419,22 +428,21 @@ def save_draft_application(
                     db_client.execute_query(
                         rel_pers_cypher,
                         {
-                            "borrower_cccd": borrower.cccd_id,
+                            "borrower_cccd": clean_borrower_cccd,
                             "rel_cccd": target_id,
                             "rel_name": rel.name,
                             "nationality": rel.nationality or "Việt Nam",
                             "rel_label": rel.specific_relationship
                         }
                     )
-
-    # -------------------------------------------------------------------------
-    # B. KHÁCH HÀNG DOANH NGHIỆP
-    # -------------------------------------------------------------------------
     else:
         corp = payload.enterprise_profile
         rep = payload.representative
         if not corp or not rep:
             raise HTTPException(status_code=400, detail="Thiếu thông tin doanh nghiệp hoặc người đại diện.")
+
+        clean_corp_tax_code = clean_identifier(corp.tax_code)
+        clean_rep_cccd = clean_identifier(rep.cccd_id)
 
         cypher_corp = """
         MERGE (c:Company {tax_code: $tax_code})
@@ -505,14 +513,14 @@ def save_draft_application(
         db_client.execute_query(
             cypher_corp,
             {
-                "tax_code": corp.tax_code,
+                "tax_code": clean_corp_tax_code,
                 "company_name": corp.company_name,
                 "short_name": corp.short_name,
                 "charter_capital": corp.charter_capital,
                 "business_sector": corp.business_sector,
                 "headquarters_address": corp.headquarters_address,
                 "nationality": corp.nationality or "Việt Nam",
-                "rep_cccd": rep.cccd_id,
+                "rep_cccd": clean_rep_cccd,
                 "rep_name": rep.full_name,
                 "rep_dob": rep.dob,
                 "rep_gender": rep.gender,
@@ -532,11 +540,12 @@ def save_draft_application(
         )
 
         for rel in payload.related_group:
-            target_id = rel.identifier if rel.identifier and rel.identifier != "NOT_FOUND" else f"TEMP-{uuid.uuid4().hex[:6]}"
+            target_id = clean_identifier(rel.identifier)
+            if not target_id:
+                target_id = f"TEMP-{uuid.uuid4().hex[:6]}"
             raw_ratio = re.sub(r"[^\d.]", "", str(rel.ownership_ratio or "0"))
             ratio_val = float(raw_ratio) if raw_ratio else 0.0
 
-            # 1. Bắc cầu qua Công ty con F1 (Công ty cháu F2 - Điểm a)
             if rel.bridge_kind == "CORP_F1_SUBSIDIARY" and rel.bridge_entity and rel.bridge_entity.identifier:
                 f1_cypher = """
                 MATCH (c:Company {tax_code: $borrower_tax_code})
@@ -558,8 +567,8 @@ def save_draft_application(
                 db_client.execute_query(
                     f1_cypher,
                     {
-                        "borrower_tax_code": corp.tax_code,
-                        "f1_tax_code": rel.bridge_entity.identifier,
+                        "borrower_tax_code": clean_corp_tax_code,
+                        "f1_tax_code": clean_identifier(rel.bridge_entity.identifier),
                         "f1_name": rel.bridge_entity.name or "Công ty con F1",
                         "bridge_pct": float(bridge_ratio_raw) if bridge_ratio_raw else 51.0,
                         "f2_tax_code": target_id,
@@ -567,8 +576,6 @@ def save_draft_application(
                         "target_pct": ratio_val
                     }
                 )
-
-            # 2. Bắc cầu qua Công ty mẹ chung (Công ty chị em - Điểm a)
             elif rel.bridge_kind == "CORP_COMMON_PARENT" and rel.bridge_entity and rel.bridge_entity.identifier:
                 parent_cypher = """
                 MATCH (c:Company {tax_code: $borrower_tax_code})
@@ -590,8 +597,8 @@ def save_draft_application(
                 db_client.execute_query(
                     parent_cypher,
                     {
-                        "borrower_tax_code": corp.tax_code,
-                        "parent_tax_code": rel.bridge_entity.identifier,
+                        "borrower_tax_code": clean_corp_tax_code,
+                        "parent_tax_code": clean_identifier(rel.bridge_entity.identifier),
                         "parent_name": rel.bridge_entity.name or "Công ty mẹ chung",
                         "parent_pct": float(parent_ratio_raw) if parent_ratio_raw else 51.0,
                         "sister_tax_code": target_id,
@@ -599,38 +606,6 @@ def save_draft_application(
                         "target_pct": ratio_val
                     }
                 )
-
-            # 3. Bắc cầu qua Công ty mẹ của Người quản lý (Điểm a)
-            elif rel.bridge_kind == "CORP_PARENT_MANAGER_BRIDGE" and rel.bridge_entity and rel.bridge_entity.identifier:
-                p_mgr_cypher = """
-                MATCH (c:Company {tax_code: $borrower_tax_code})
-                MERGE (p:Company {tax_code: $parent_tax_code})
-                ON CREATE SET p.name = $parent_name, p.created_at = datetime()
-                ON MATCH SET p.name = coalesce($parent_name, p.name), p.updated_at = datetime()
-
-                MERGE (pm:Person {cccd: $mgr_cccd})
-                ON CREATE SET pm.full_name = $mgr_name, pm.cif = 'CIF-' + substring($mgr_cccd, 0, 6), pm.created_at = datetime()
-                ON MATCH SET pm.full_name = coalesce($mgr_name, pm.full_name), pm.updated_at = datetime()
-
-                MERGE (p)-[r1:RELATED_TO {relation_point: "a"}]->(c)
-                SET r1.relation_subtype = "Công ty con", r1.relation_tier = "mandatory", r1.effective_from = toString(date())
-
-                MERGE (pm)-[r2:RELATED_TO {relation_point: "b"}]->(p)
-                SET r2.position = $manager_pos, r2.relation_subtype = $manager_pos, r2.relation_tier = "mandatory", r2.effective_from = toString(date())
-                """
-                db_client.execute_query(
-                    p_mgr_cypher,
-                    {
-                        "borrower_tax_code": corp.tax_code,
-                        "parent_tax_code": rel.bridge_entity.identifier,
-                        "parent_name": rel.bridge_entity.name or "Công ty mẹ",
-                        "mgr_cccd": target_id,
-                        "mgr_name": rel.name,
-                        "manager_pos": rel.bridge_entity.role_or_relationship or "Chủ tịch HĐQT / Lãnh đạo"
-                    }
-                )
-
-            # 4. Bắc cầu qua Lãnh đạo / Cổ đông lớn tới Người thân (Điểm đ)
             elif rel.bridge_kind == "CORP_LEADER_FAMILY_BRIDGE" and rel.bridge_entity and rel.bridge_entity.identifier:
                 lead_fam_cypher = """
                 MATCH (c:Company {tax_code: $borrower_tax_code})
@@ -651,8 +626,8 @@ def save_draft_application(
                 db_client.execute_query(
                     lead_fam_cypher,
                     {
-                        "borrower_tax_code": corp.tax_code,
-                        "leader_cccd": rel.bridge_entity.identifier,
+                        "borrower_tax_code": clean_corp_tax_code,
+                        "leader_cccd": clean_identifier(rel.bridge_entity.identifier),
                         "leader_name": rel.bridge_entity.name or "Lãnh đạo DN vay",
                         "leader_pos": rel.bridge_entity.role_or_relationship or "Chủ tịch HĐQT",
                         "rel_cccd": target_id,
@@ -660,8 +635,6 @@ def save_draft_application(
                         "target_rel": rel.specific_relationship
                     }
                 )
-
-            # 5. Quan hệ trực tiếp 0-Hop
             else:
                 if rel.entity_type == "ORGANIZATION":
                     rel_org_cypher = """
@@ -683,7 +656,7 @@ def save_draft_application(
                     db_client.execute_query(
                         rel_org_cypher,
                         {
-                            "borrower_tax_code": corp.tax_code,
+                            "borrower_tax_code": clean_corp_tax_code,
                             "rel_id": target_id,
                             "rel_name": rel.name,
                             "nationality": rel.nationality or "Việt Nam",
@@ -714,7 +687,7 @@ def save_draft_application(
                     db_client.execute_query(
                         rel_person_cypher,
                         {
-                            "borrower_tax_code": corp.tax_code,
+                            "borrower_tax_code": clean_corp_tax_code,
                             "rel_id": target_id,
                             "rel_name": rel.name,
                             "nationality": rel.nationality or "Việt Nam",
@@ -730,7 +703,7 @@ def save_draft_application(
         "status": "DRAFT_SAVED_SUCCESSFULLY",
         "application_id": payload.application_id,
         "loan_id": payload.loan_id,
-        "message": f"Toàn bộ thực thể (gốc, trung gian & đích) đã được Upsert vào Master DB. Khoản vay {payload.loan_id} đã lưu Sandbox."
+        "message": f"Thực thể đã được Upsert vào Master DB. Khoản vay {payload.loan_id} đã lưu Sandbox."
     }
 
 # =============================================================
@@ -776,11 +749,11 @@ def get_draft_application_detail(
     if not result:
         raise HTTPException(status_code=404, detail="Không tìm thấy hồ sơ.")
 
-    borrower_id = result[0]["app"].get("identifier")
+    borrower_id = clean_identifier(result[0]["app"].get("identifier"))
     customer_type = result[0]["app"].get("customer_type", "INDIVIDUAL")
     loan_amount = float(result[0]["app"].get("loan_amount", 0.0))
+    app_created_at = str(result[0]["app"].get("created_at", "2026-08-19"))
 
-    # 1. Truy vấn các Cạnh Xanh (mandatory 1..2 hops) trong Master DB
     if customer_type == "INDIVIDUAL":
         rel_query = """
         MATCH (p:Person {cccd: $identifier})-[r1*1..2]-(m)
@@ -806,13 +779,9 @@ def get_draft_application_detail(
             properties(t) AS target_props
         """
     direct_relationships = db_client.execute_query(rel_query, {"identifier": borrower_id})
-
-    # 2. Chạy Rule Engine phát hiện Cạnh Vàng (risk_based - Điểm g)
     risk_based_flags = GraphRuleEngine.detect_risk_based_relationships(borrower_id, customer_type)
-
-    # 3. Chạy Exposure Engine tính toán giới hạn Điều 136
     exposure_analytics = GraphRuleEngine.compute_connected_group_and_exposure(
-        borrower_id, customer_type, loan_amount
+        borrower_id, customer_type, loan_amount, app_created_at
     )
 
     return {
@@ -835,6 +804,8 @@ def review_relationship(
     current_user: Any = Depends(get_current_user)
 ):
     officer_name = getattr(current_user, "username", None) or "officer"
+    id1 = clean_identifier(payload.entity_id_1)
+    id2 = clean_identifier(payload.entity_id_2)
     
     if payload.review_status == "confirmed_related":
         confirm_cypher = """
@@ -852,7 +823,7 @@ def review_relationship(
         """
         db_client.execute_query(
             confirm_cypher,
-            {"id1": payload.entity_id_1, "id2": payload.entity_id_2, "officer": officer_name}
+            {"id1": id1, "id2": id2, "officer": officer_name}
         )
     else:
         dismiss_cypher = """
@@ -870,7 +841,7 @@ def review_relationship(
         """
         db_client.execute_query(
             dismiss_cypher,
-            {"id1": payload.entity_id_1, "id2": payload.entity_id_2, "note": payload.review_note, "officer": officer_name}
+            {"id1": id1, "id2": id2, "note": payload.review_note, "officer": officer_name}
         )
 
     return {
