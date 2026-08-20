@@ -14,6 +14,11 @@ from app.db.neo4j_client import db_client
 router = APIRouter()
 
 def clean_identifier(val: Any) -> str:
+    """
+    Chuẩn hóa tuyệt đối Mã định danh (CCCD 12 số, MST 10 hoặc 13 số):
+    - Đệm số 0 vào đầu nếu bị thiếu do đọc số trong Excel
+    - Xóa đuôi '.0' nếu có
+    """
     if not val:
         return ""
     s = str(val).strip()
@@ -729,6 +734,29 @@ def list_draft_applications(current_user: Any = Depends(get_current_user)):
     """
     results = db_client.execute_query(query)
     return {"applications": results}
+# =============================================================
+# 4. CHI TIẾT HỒ SƠ & PHÂN TÍCH RULE ENGINE (ĐIỂM G & ĐIỀU 136)
+# =============================================================
+@router.get("/draft-applications")
+def list_draft_applications(current_user: Any = Depends(get_current_user)):
+    query = """
+    MATCH (app:DraftApplication)
+    RETURN 
+        app.app_code AS app_code,
+        app.loan_id AS loan_id,
+        app.customer_type AS customer_type,
+        app.borrower_name AS borrower_name,
+        app.identifier AS identifier,
+        app.loan_amount AS loan_amount,
+        app.purpose AS purpose,
+        app.term_months AS term_months,
+        app.status AS status,
+        app.officer AS officer,
+        toString(app.created_at) AS created_at
+    ORDER BY app.created_at DESC
+    """
+    results = db_client.execute_query(query)
+    return {"applications": results}
 
 @router.get("/draft-applications/{app_code}")
 def get_draft_application_detail(
@@ -754,32 +782,49 @@ def get_draft_application_detail(
     loan_amount = float(result[0]["app"].get("loan_amount", 0.0))
     app_created_at = str(result[0]["app"].get("created_at", "2026-08-19"))
 
-    if customer_type == "INDIVIDUAL":
-        rel_query = """
-        MATCH (p:Person {cccd: $identifier})-[r1*1..2]-(m)
-        WITH DISTINCT last(r1) AS r, startNode(last(r1)) AS s, endNode(last(r1)) AS t
-        RETURN 
-            type(r) AS relation_type,
-            properties(r) AS relation_props,
-            labels(s) AS source_labels,
-            properties(s) AS source_props,
-            labels(t) AS target_labels,
-            properties(t) AS target_props
-        """
-    else:
-        rel_query = """
-        MATCH (c:Company {tax_code: $identifier})-[r1*1..2]-(m)
-        WITH DISTINCT last(r1) AS r, startNode(last(r1)) AS s, endNode(last(r1)) AS t
-        RETURN 
-            type(r) AS relation_type,
-            properties(r) AS relation_props,
-            labels(s) AS source_labels,
-            properties(s) AS source_props,
-            labels(t) AS target_labels,
-            properties(t) AS target_props
-        """
+    # 1. Truy vấn CHÍNH XÁC các cạnh quan hệ pháp lý giữa Person và Company (1..2 hops)
+    rel_query = """
+    MATCH (root) WHERE (root.cccd = $identifier OR root.tax_code = $identifier)
+    MATCH path = (root)-[r1:FAMILY|RELATED_TO|LEGAL_REPRESENTATIVE*1..2]-(m)
+    WHERE (m:Person OR m:Company)
+    WITH DISTINCT relationships(path) AS rels
+    UNWIND rels AS r
+    WITH DISTINCT r, startNode(r) AS s, endNode(r) AS t
+    WHERE (s:Person OR s:Company) AND (t:Person OR t:Company)
+    RETURN 
+        type(r) AS relation_type,
+        properties(r) AS relation_props,
+        labels(s) AS source_labels,
+        properties(s) AS source_props,
+        labels(t) AS target_labels,
+        properties(t) AS target_props
+    """
     direct_relationships = db_client.execute_query(rel_query, {"identifier": borrower_id})
+
+    # 2. Truy vấn các khoản vay thực tế (:Loan) của các thực thể trong mạng lưới
+    loans_query = """
+    MATCH (root) WHERE (root.cccd = $identifier OR root.tax_code = $identifier)
+    MATCH path = (root)-[r1:FAMILY|RELATED_TO|LEGAL_REPRESENTATIVE*0..2]-(m)
+    WHERE (m:Person OR m:Company) 
+      AND all(rel in r1 WHERE rel.relation_tier = 'mandatory' OR rel.review_status = 'confirmed_related')
+    WITH DISTINCT m
+    MATCH (m)-[rb:BORROWED]->(l:Loan {status: 'ACTIVE'})-[:FROM_BANK]->(b:Bank)
+    RETURN 
+        coalesce(m.cccd, m.tax_code) AS borrower_id,
+        coalesce(m.full_name, m.name) AS borrower_name,
+        labels(m)[0] AS borrower_type,
+        l.loan_id AS loan_id,
+        l.balance AS balance,
+        l.amount AS amount,
+        l.purpose AS purpose,
+        b.name AS bank_name
+    """
+    active_loans = db_client.execute_query(loans_query, {"identifier": borrower_id})
+
+    # 3. Quét Cạnh Vàng (risk_based - Điểm g)
     risk_based_flags = GraphRuleEngine.detect_risk_based_relationships(borrower_id, customer_type)
+
+    # 4. Phân tích Dư nợ & Hạn mức Điều 136
     exposure_analytics = GraphRuleEngine.compute_connected_group_and_exposure(
         borrower_id, customer_type, loan_amount, app_created_at
     )
@@ -790,6 +835,7 @@ def get_draft_application_detail(
         "borrower_type": result[0]["borrower_labels"],
         "loan": result[0]["loan_props"],
         "relationships": direct_relationships,
+        "active_loans": active_loans,
         "risk_based_flags": risk_based_flags,
         "exposure_analytics": exposure_analytics
     }
