@@ -30,28 +30,28 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
 
   return (
     <aside
-      className={`bg-gradient-to-b from-[#2E125B] via-[#3B1878] to-[#4C1D95] text-white flex flex-col justify-between transition-all duration-300 sticky top-0 h-screen z-40 shadow-2xl flex-shrink-0 ${
+      className={`bg-gradient-to-b from-[#1E0B3D] via-[#2E125B] to-[#3B1878] text-white flex flex-col justify-between transition-all duration-300 sticky top-0 h-screen z-40 shadow-2xl flex-shrink-0 border-r border-white/10 ${
         isCollapsed ? "w-20" : "w-72"
       }`}
     >
       <div className="p-4 space-y-6">
+        {/* LOGO BRANDING MONYX */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3 overflow-hidden">
-            <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-[#6D28D9] to-[#A78BFA] flex items-center justify-center text-white font-black text-xl shadow-md flex-shrink-0">
-              ✦
-            </div>
-            {!isCollapsed && (
-              <div>
-                <span className="font-black text-lg text-white tracking-tight block">MonyX</span>
-                <span className="text-[10px] text-purple-300 font-mono block -mt-1 font-semibold">
-                  Master Data Manager
-                </span>
+            {isCollapsed ? (
+              <div className="w-11 h-11 rounded-2xl bg-white/95 p-1.5 shadow-lg flex items-center justify-center flex-shrink-0">
+                <img src="/logo.png" alt="MonyX" className="w-full h-full object-contain" />
+              </div>
+            ) : (
+              <div className="bg-white/95 rounded-2xl px-3 py-1.5 shadow-md flex items-center gap-2 border border-white/20">
+                <img src="/logo.png" alt="MonyX Logo" className="h-7 w-auto object-contain" />
               </div>
             )}
           </div>
           <button
             onClick={onToggleCollapse}
             className="p-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-purple-200 transition cursor-pointer flex-shrink-0"
+            title={isCollapsed ? "Mở rộng thanh menu" : "Thu gọn thanh menu"}
           >
             {isCollapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
           </button>
@@ -68,6 +68,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
           </div>
         )}
 
+        {/* DANH SÁCH MENU TAB */}
         <nav className="space-y-2 pt-2">
           {menuItems.map((item) => {
             const Icon = item.icon;
@@ -78,7 +79,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
                 onClick={() => onSelectCategory(item.key)}
                 className={`w-full flex items-center gap-3.5 px-4 py-3.5 rounded-2xl text-xs font-bold transition cursor-pointer text-left ${
                   active
-                    ? "bg-white text-[#3B1878] shadow-lg shadow-black/10 font-extrabold"
+                    ? "bg-white text-[#3B1878] shadow-lg shadow-black/15 font-extrabold"
                     : "text-purple-200 hover:bg-white/10 hover:text-white"
                 }`}
                 title={item.label}
@@ -91,9 +92,10 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
         </nav>
       </div>
 
+      {/* USER BADGE & LOGOUT */}
       <div className="p-4 border-t border-white/10 space-y-3">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-purple-400/30 flex items-center justify-center font-bold text-white font-mono flex-shrink-0">
+          <div className="w-9 h-9 rounded-xl bg-purple-400/30 flex items-center justify-center font-bold text-white font-mono flex-shrink-0 border border-white/10">
             AD
           </div>
           {!isCollapsed && (

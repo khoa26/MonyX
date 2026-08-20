@@ -98,7 +98,7 @@ export default function DataAdminView({ session, onLogout }: DataAdminViewProps)
       default:
         return {
           title: "Quản trị Tham số Ngân hàng",
-          desc: "Thiết lập nguồn vốn tự có và tỷ lệ an toàn vốn.",
+          desc: "Thiết lập nguồn vốn tự có và tỷ lệ an toàn vốn Điều 136.",
           schema: "Core Configuration",
           reqCols: "N/A",
         };
@@ -108,7 +108,7 @@ export default function DataAdminView({ session, onLogout }: DataAdminViewProps)
   const meta = getCategoryMeta();
 
   return (
-    <div className="min-h-screen flex bg-[#F8F7FC] text-gray-900">
+    <div className="min-h-screen flex bg-[#F8F7FC] bg-[url('/background.png')] bg-cover bg-fixed bg-center text-gray-900">
       <AdminSidebar
         currentCategory={adminCategory}
         onSelectCategory={(cat) => {
@@ -123,24 +123,24 @@ export default function DataAdminView({ session, onLogout }: DataAdminViewProps)
       />
 
       <div className="flex-1 flex flex-col min-w-0">
-        <header className="bg-white/80 backdrop-blur-md border-b border-purple-100/60 sticky top-0 z-30 h-16 px-8 flex items-center justify-between">
+        <header className="bg-white/75 backdrop-blur-md border-b border-purple-100/60 sticky top-0 z-30 h-16 px-8 flex items-center justify-between">
           <div className="relative w-96">
             <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
             <input
               type="text"
               placeholder="Tìm kiếm danh mục dữ liệu, mã định danh..."
-              className="w-full pl-10 pr-4 py-2 bg-purple-50/40 border border-purple-100 rounded-xl text-xs focus:bg-white focus:ring-2 focus:ring-[#7C3AED] outline-none transition font-medium"
+              className="w-full pl-10 pr-4 py-2 bg-purple-50/50 border border-purple-100 rounded-xl text-xs focus:bg-white focus:ring-2 focus:ring-[#7C3AED] outline-none transition font-medium"
             />
           </div>
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-purple-50 text-purple-900 border border-purple-100 text-xs font-medium font-mono">
               <Calendar className="w-3.5 h-3.5 text-purple-600" />
-              <span>19 Aug 2026</span>
+              <span>20 Aug 2026</span>
             </div>
-            <div className="w-8 h-8 rounded-xl bg-gray-100 hover:bg-purple-50 text-gray-600 hover:text-purple-700 flex items-center justify-center transition cursor-pointer">
+            <div className="w-8 h-8 rounded-xl bg-white/80 hover:bg-purple-50 text-gray-600 hover:text-purple-700 flex items-center justify-center transition cursor-pointer border border-purple-50 shadow-xs">
               <Bell className="w-4 h-4" />
             </div>
-            <div className="w-8 h-8 rounded-xl bg-gray-100 hover:bg-purple-50 text-gray-600 hover:text-purple-700 flex items-center justify-center transition cursor-pointer">
+            <div className="w-8 h-8 rounded-xl bg-white/80 hover:bg-purple-50 text-gray-600 hover:text-purple-700 flex items-center justify-center transition cursor-pointer border border-purple-50 shadow-xs">
               <HelpCircle className="w-4 h-4" />
             </div>
           </div>
@@ -150,7 +150,7 @@ export default function DataAdminView({ session, onLogout }: DataAdminViewProps)
           {adminCategory === "BANK_CONFIG" ? (
             <BankConfigManager session={session} />
           ) : (
-            <div className="bg-white rounded-3xl p-8 border border-purple-100 shadow-xs space-y-6">
+            <div className="bg-white/95 backdrop-blur-md rounded-3xl p-8 border border-purple-100 shadow-sm space-y-6">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-purple-50 gap-4">
                 <div>
                   <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-50 text-purple-700 text-xs font-semibold mb-2 border border-purple-100">
