@@ -2,8 +2,7 @@
 
 import React, { useState } from "react";
 import LoginForm from "@/components/auth/LoginForm";
-import DataAdminView from "@/components/admin/DataAdminView";
-import OfficerPortal from "@/components/officer/OfficerPortal";
+import Dashboard from "@/components/Dashboard";
 import { UserSession } from "@/types";
 
 export default function Home() {
@@ -18,11 +17,6 @@ export default function Home() {
     return <LoginForm onLoginSuccess={setSession} />;
   }
 
-  // 2. Màn hình làm việc Quản trị viên (Data Admin)
-  if (session.role === "DATA_ADMIN") {
-    return <DataAdminView session={session} onLogout={handleLogout} />;
-  }
-
-  // 3. Màn hình làm việc Cán bộ Thẩm định (Officer Portal)
-  return <OfficerPortal session={session} onLogout={handleLogout} />;
+  // 2. Dashboard (màn hình chính sau đăng nhập, tự phân vai theo role)
+  return <Dashboard session={session} onLogout={handleLogout} />;
 }
